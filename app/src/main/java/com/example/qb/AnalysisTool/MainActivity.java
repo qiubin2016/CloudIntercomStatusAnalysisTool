@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView;
     private EditText editText;
     private Handler handler;
+    private TextView displayTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         textView = findViewById(R.id.textView2);
-        textView.setText(spannableString);
+//        textView.setText(spannableString);
 
 
         int[] ids = new int[]{R.id.lTextView0, R.id.lTextView1, R.id.lTextView2, R.id.lTextView3, R.id.lTextView4, R.id.lTextView5,
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
             txs[i].setText("0");
             txs[i].setGravity(Gravity.CENTER);
         }
+
+        displayTextView = findViewById(R.id.displayTextView);
 
         editText = findViewById(R.id.editText);
         editText.addTextChangedListener(new TextWatcher() {
@@ -85,10 +88,19 @@ public class MainActivity extends AppCompatActivity {
                 //sendMessage()方法，无论是在主线程中还是WorkThread中发送都是可以的
                 handler.sendMessage(msg);
 
-                int integer = Integer.valueOf(s.toString(),16);   //d=255
-                String result = Integer.toBinaryString(integer);
-                Log.i(getClass().getName(), "line:" + Thread.currentThread().getStackTrace()[2].getLineNumber()
-                + ",result:" + result);
+                int integer;
+                long longData;
+                String result;
+                if (!s.toString().isEmpty()) {
+//                    integer = Integer.valueOf(s.toString(), 16);   //d=255
+                    longData = Long.valueOf(s.toString(), 16);   //d=255
+//                    result = Integer.toBinaryString(integer);
+                    result = Long.toBinaryString(longData);
+                    Log.i(getClass().getName(), "line:" + Thread.currentThread().getStackTrace()[2].getLineNumber()
+                            + ",result:" + result);
+                } else {
+                    result = "";
+                }
 
 //                txs[0].setText("1");
                 char charText;
@@ -110,10 +122,16 @@ public class MainActivity extends AppCompatActivity {
                     else
                     {
                         txs[i].setText("0");
+                        txs[i].setTextColor(Color.GRAY);
                         Log.i(getClass().getName(), "line:" + Thread.currentThread().getStackTrace()[2].getLineNumber());
 
                     }
                 }
+
+                String displayStr = analyString(result);
+                Log.i(getClass().getName(), "line:" + Thread.currentThread().getStackTrace()[2].getLineNumber() + ",display:" + displayStr);
+                //解析并显示
+                displayTextView.setText(displayStr);
             }
         });
 
@@ -140,6 +158,72 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public String analyString(String string) {
+        int i = 0;
+        char charText;
+        String resultStr = "";
+
+        for  (i = 0; i < string.length(); i++) {
+            charText = string.charAt(string.length() - i - 1);
+            if ('0' != charText) {
+                switch (i) {
+                    case 0:
+                        resultStr += String.format("%d-门禁通行记录预满\n", i);
+                        break;
+                    case 1:
+                        resultStr += String.format("%d-电话通行记录预满\n", i);
+                        break;
+                    case 5:
+                        resultStr += String.format("%d-下载PID文件失败\n", i);
+                        break;
+                    case 6:
+                        resultStr += String.format("%d-后台返回业务云通讯地址为空\n", i);
+                        break;
+                    case 7:
+                        resultStr += String.format("%d-参数错误（后台返回）\n", i);
+                        break;
+                    case 8:
+                        resultStr += String.format("%d-设备不存在（后台未登记设备）\n", i);
+                        break;
+                    case 9:
+                        resultStr += String.format("%d-设备已禁用（后台将项目/设备禁用\n", i);
+                        break;
+                    case 10:
+                        resultStr += String.format("%d-项目型号错误\n", i);
+                        break;
+                    case 11:
+                        resultStr += String.format("%d-云后台系统故障\n", i);
+                        break;
+                    case 12:
+                        resultStr += String.format("%d-Token无效（云后台返回的Token已过期）\n", i);
+                        break;
+                    case 13:
+                        resultStr += String.format("%d-与QQ物联云服务器通讯异常\n", i);
+                        break;
+                    case 14:
+                        resultStr += String.format("%d-设备未绑定\n", i);
+                        break;
+                    case 15:
+                        resultStr += String.format("%d-与SIP服务器通讯故障\n", i);
+                        break;
+                    case 16:
+                        resultStr += String.format("%d-网线未插入\n", i);
+                        break;
+                    case 17:
+                        resultStr += String.format("%d-网络异常\n", i);
+                        break;
+                    case 18:
+                        resultStr += String.format("%d-与一卡通服务器通讯故障\n", i);
+                        break;
+                    case 24:
+                        resultStr += String.format("%d-未读管理卡\n", i);
+                        break;
+                }
+            }
+        }
+        return resultStr;
     }
 
     /*
